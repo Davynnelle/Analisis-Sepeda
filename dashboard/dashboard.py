@@ -6,50 +6,50 @@ import datetime
 
 sns.set(style='dark')
 plt.style.use('dark_background')
-# Helper function yang dibutuhkan untuk menyiapkan berbagai dataframe
 
+# Helper function yang dibutuhkan untuk menyiapkan berbagai dataframe
 def create_casual_register_df(df):
     casual_year_df = df.groupby("yr")["casual"].sum().reset_index()
     casual_year_df.columns = ["yr", "total_casual"]
     reg_year_df = df.groupby("yr")["registered"].sum().reset_index()
-    reg_year_df.columns = ["yr", "total_registered"]  
+    reg_year_df.columns = ["yr", "total_registered"]
     casual_register_df = casual_year_df.merge(reg_year_df, on="yr")
     return casual_register_df
 
 def create_monthly_df(df):
-    monthly_df = df.groupby(by=["mnth","yr"]).agg({
+    monthly_df = df.groupby(by=["mnth", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return monthly_df
 
 def create_hourly_df(df):
-    hourly_df = df.groupby(by=["hr","yr"]).agg({
+    hourly_df = df.groupby(by=["hr", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return hourly_df
 
 def create_byholiday_df(df):
-    holiday_df = df.groupby(by=["holiday","yr"]).agg({
+    holiday_df = df.groupby(by=["holiday", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return holiday_df
 
 def create_byworkingday_df(df):
-    workingday_df = df.groupby(by=["workingday","yr"]).agg({
+    workingday_df = df.groupby(by=["workingday", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return workingday_df
 
 def create_byseason_df(df):
-    season_df = df.groupby(by=["season","yr"]).agg({
+    season_df = df.groupby(by=["season", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return season_df
 
 def create_byweather_df(df):
-    weather_df = df.groupby(by=["weathersit","yr"]).agg({
+    weather_df = df.groupby(by=["weathersit", "yr"]).agg({
         "cnt": "sum"
-    }).reset_index() 
+    }).reset_index()
     return weather_df
 
 # Load cleaned data
@@ -63,9 +63,9 @@ min_date = day_clean_df["dteday"].min()
 max_date = day_clean_df["dteday"].max()
 
 with st.sidebar:
-    # Menambahkan logo 
+    # Menambahkan logo
     st.image("dashboard/undraw_bike_ride_7xit.png")
-    
+
     # Mengambil start_date & end_date dari date_input
     start_date, end_date = st.date_input(
         label='Rentang Waktu',
@@ -74,14 +74,13 @@ with st.sidebar:
         value=[min_date, max_date]
     )
 
-main_df = day_clean_df[(day_clean_df["dteday"] >= str(start_date)) & 
+main_df = day_clean_df[(day_clean_df["dteday"] >= str(start_date)) &
                        (day_clean_df["dteday"] <= str(end_date))]
 
-second_df = hour_df[(hour_df["dteday"] >= str(start_date)) & 
-                       (hour_df["dteday"] <= str(end_date))]
+second_df = hour_df[(hour_df["dteday"] >= str(start_date)) &
+                    (hour_df["dteday"] <= str(end_date))]
 
-
-# # Menyiapkan berbagai dataframe
+# Menyiapkan berbagai dataframe
 casual_register_df = create_casual_register_df(main_df)
 monthly_df = create_monthly_df(main_df)
 hourly_df = create_hourly_df(second_df)
@@ -99,8 +98,10 @@ st.subheader('Statistik Total Casual Vs Total Registered')
 fig, ax = plt.subplots()
 index = casual_register_df["yr"]
 bar_width = 0.35
-p1 = ax.bar(index, casual_register_df["total_casual"], bar_width, label="Total Casual", color="b")
-p2 = ax.bar(index + bar_width, casual_register_df["total_registered"], bar_width, label="Total Registered", color="g")
+p1 = ax.bar(index, casual_register_df["total_casual"],
+            bar_width, label="Total Casual", color="b")
+p2 = ax.bar(index + bar_width,
+            casual_register_df["total_registered"], bar_width, label="Total Registered", color="g")
 ax.set_xlabel("Year")
 ax.set_ylabel("Jumlah")
 ax.set_title("Total Casual vs Total Registered by Year")
@@ -109,34 +110,37 @@ ax.set_xticklabels(casual_register_df["yr"])
 ax.legend()
 for p in p1 + p2:
     height = p.get_height()
-    ax.text(p.get_x() + p.get_width() / 2., height + 1, str(int(height)), ha="center")
+    ax.text(p.get_x() + p.get_width() / 2., height +
+            1, str(int(height)), ha="center")
 plt.tight_layout()
 st.pyplot(plt.gcf())
 
-
-# pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan bulan 
+# pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan bulan
 st.subheader("Statistik Pola Total Penyewaan Sepeda Berdasarkan Bulan")
 fig, ax = plt.subplots()
-sns.lineplot(data=monthly_df, x="mnth", y="cnt", hue="yr", palette="pastel", marker="o")
+sns.lineplot(data=monthly_df, x="mnth", y="cnt",
+             hue="yr", palette="pastel", marker="o")
 plt.xlabel("Urutan Bulan")
 plt.ylabel("Jumlah")
 plt.title("Jumlah total sepeda yang disewakan berdasarkan Bulan dan tahun")
-plt.legend(title="Tahun", loc="upper right")  
+plt.legend(title="Tahun", loc="upper right")
 plt.xticks(ticks=monthly_df["mnth"], labels=monthly_df["mnth"])
 plt.tight_layout()
 for line in ax.lines:
     for x, y in zip(line.get_xdata(), line.get_ydata()):
-        plt.text(x, y, '{:.0f}'.format(y), color="white", ha="center", fontsize=8).set_backgroundcolor("gray")
+        plt.text(x, y, '{:.0f}'.format(y), color="white",
+                 ha="center", fontsize=8).set_backgroundcolor("gray")
 st.pyplot(fig)
 
 # pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan Jam
 st.subheader("Statistik Pola Total Penyewaan Sepeda Berdasarkan Jam")
 fig, ax = plt.subplots()
-sns.lineplot(data=hourly_df, x="hr", y="cnt", hue="yr", palette="pastel", marker="o")
+sns.lineplot(data=hourly_df, x="hr", y="cnt",
+             hue="yr", palette="pastel", marker="o")
 plt.xlabel("Urutan Jam")
 plt.ylabel("Jumlah")
 plt.title("Jumlah total sepeda yang disewakan berdasarkan Jam dan tahun")
-plt.legend(title="Tahun", loc="upper right")  
+plt.legend(title="Tahun", loc="upper right")
 plt.xticks(ticks=hourly_df["hr"], labels=hourly_df["hr"])
 plt.tight_layout()
 st.pyplot(fig)
@@ -149,9 +153,10 @@ with col_holiday:
     sns.barplot(data=holiday_df, x="holiday", y="cnt", hue="yr", palette="viridis")
     plt.ylabel("Jumlah")
     plt.title("Jumlah total sepeda yang disewakan berdasarkan hari Libur")
-    plt.legend(title="Tahun", loc="upper right")  
+    plt.legend(title="Tahun", loc="upper right")
     for container in ax.containers:
-        ax.bar_label(container, fontsize=8, color='white', weight='bold', label_type='edge')
+        ax.bar_label(container, fontsize=8, color='white',
+                     weight='bold', label_type='edge')
     plt.tight_layout()
     st.pyplot(fig)
 with col_workingday:
@@ -159,52 +164,56 @@ with col_workingday:
     sns.barplot(data=workingday_df, x="workingday", y="cnt", hue="yr", palette="viridis")
     plt.ylabel("Jumlah")
     plt.title("Jumlah total sepeda yang disewakan berdasarkan hari Kerja")
-    plt.legend(title="Tahun", loc="upper right")  
+    plt.legend(title="Tahun", loc="upper right")
     for container in ax.containers:
-        ax.bar_label(container, fontsize=8, color='white', weight='bold', label_type='edge')
+        ax.bar_label(container, fontsize=8, color='white',
+                     weight='bold', label_type='edge')
     plt.tight_layout()
     st.pyplot(fig)
-        
+
 # pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan Musim
 st.subheader("Statistik total penyewaan sepeda berdasarkan Musim")
 fig, ax = plt.subplots()
 sns.barplot(data=season_df, x="season", y="cnt", hue="yr", palette="viridis")
 plt.ylabel("Jumlah")
 plt.title("Jumlah total sepeda yang disewakan berdasarkan Musim")
-plt.legend(title="Tahun", loc="upper right")  
+plt.legend(title="Tahun", loc="upper right")
 for container in ax.containers:
-    ax.bar_label(container, fontsize=8, color='white', weight='bold', label_type='edge')
+    ax.bar_label(container, fontsize=8, color='white',
+                 weight='bold', label_type='edge')
 plt.tight_layout()
 st.pyplot(fig)
 with st.expander('Keterangan'):
     st.write(
         """
-        `Winter`: Musim Dingin  
-        `Summer`: Musim Panas  
-        `Springer`: Musim Semi  
+        `Winter`: Musim Dingin
+        `Summer`: Musim Panas
+        `Springer`: Musim Semi
         `Fall`: Musim Gugur
         """
     )
-    
+
 # pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan Cuaca
 st.subheader("Statistik total penyewaan sepeda berdasarkan Cuaca")
 fig, ax = plt.subplots()
 sns.barplot(data=weather_df, x="weathersit", y="cnt", hue="yr", palette="viridis")
 plt.ylabel("Jumlah")
 plt.title("Jumlah total sepeda yang disewakan berdasarkan Cuaca")
-plt.legend(title="Tahun", loc="upper right")  
+plt.legend(title="Tahun", loc="upper right")
 for container in ax.containers:
-    ax.bar_label(container, fontsize=8, color='white', weight='bold', label_type='edge')
+    ax.bar_label(container, fontsize=8, color='white',
+                 weight='bold', label_type='edge')
 plt.tight_layout()
 st.pyplot(fig)
 with st.expander('Keterangan'):
     st.write(
         """
         `1`: Clear
-        
+
         `2`: Mist + Cloudy
-        
+
         `3`: Light Snow
         """
     )
+
 st.caption("Copyright " + str(datetime.date.today().year) + " " + "[DYF]")
