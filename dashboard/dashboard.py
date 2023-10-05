@@ -4,10 +4,12 @@ import seaborn as sns
 import streamlit as st
 import datetime
 
+# Set seaborn style
 sns.set(style='dark')
-plt.style.use('dark_background')
 
-# Helper function yang dibutuhkan untuk menyiapkan berbagai dataframe
+# Function yang dibutuhkan untuk menyiapkan berbagai dataframe
+
+
 def create_casual_register_df(df):
     casual_year_df = df.groupby("yr")["casual"].sum().reset_index()
     casual_year_df.columns = ["yr", "total_casual"]
@@ -16,11 +18,13 @@ def create_casual_register_df(df):
     casual_register_df = casual_year_df.merge(reg_year_df, on="yr")
     return casual_register_df
 
+
 def create_monthly_df(df):
     monthly_df = df.groupby(by=["mnth", "yr"]).agg({
         "cnt": "sum"
     }).reset_index()
     return monthly_df
+
 
 def create_hourly_df(df):
     hourly_df = df.groupby(by=["hr", "yr"]).agg({
@@ -28,11 +32,13 @@ def create_hourly_df(df):
     }).reset_index()
     return hourly_df
 
+
 def create_byholiday_df(df):
     holiday_df = df.groupby(by=["holiday", "yr"]).agg({
         "cnt": "sum"
     }).reset_index()
     return holiday_df
+
 
 def create_byworkingday_df(df):
     workingday_df = df.groupby(by=["workingday", "yr"]).agg({
@@ -40,11 +46,13 @@ def create_byworkingday_df(df):
     }).reset_index()
     return workingday_df
 
+
 def create_byseason_df(df):
     season_df = df.groupby(by=["season", "yr"]).agg({
         "cnt": "sum"
     }).reset_index()
     return season_df
+
 
 def create_byweather_df(df):
     weather_df = df.groupby(by=["weathersit", "yr"]).agg({
@@ -52,8 +60,10 @@ def create_byweather_df(df):
     }).reset_index()
     return weather_df
 
+
 # Load cleaned data
-day_clean_df = pd.read_csv("dashboard/main_data.csv")
+day_clean_df = pd.read_csv("dashboard/dashboard.py")
+
 hour_df = pd.read_csv("data/hour.csv")
 
 # Filter data
@@ -90,9 +100,7 @@ hourly_df = hourly_df.replace({
     "yr": {0: 2011, 1: 2012}
 })
 
-print(main_df.head())
-
-st.header('Bike Sharing Dashboard 🚵')
+st.header('Bike Sharing Dashboard')
 # Menampilkan Bagaimana tren terakhir terkait jumlah pengguna baru dengan pengguna casual dalam beberapa tahun terakhir
 st.subheader('Statistik Total Casual Vs Total Registered')
 fig, ax = plt.subplots()
@@ -146,11 +154,13 @@ plt.tight_layout()
 st.pyplot(fig)
 
 # pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan Hari Libur dan Hari Kerja
-st.subheader("Statistik total penyewaan sepeda Berdasarkan Hari Libur dan Hari Kerja")
+st.subheader(
+    "Statistik total penyewaan sepeda Berdasarkan Hari Libur dan Hari Kerja")
 col_holiday, col_workingday = st.columns([1, 1])
 with col_holiday:
     fig, ax = plt.subplots()
-    sns.barplot(data=holiday_df, x="holiday", y="cnt", hue="yr", palette="viridis")
+    sns.barplot(data=holiday_df, x="holiday",
+                y="cnt", hue="yr", palette="viridis")
     plt.ylabel("Jumlah")
     plt.title("Jumlah total sepeda yang disewakan berdasarkan hari Libur")
     plt.legend(title="Tahun", loc="upper right")
@@ -161,7 +171,8 @@ with col_holiday:
     st.pyplot(fig)
 with col_workingday:
     fig, ax = plt.subplots()
-    sns.barplot(data=workingday_df, x="workingday", y="cnt", hue="yr", palette="viridis")
+    sns.barplot(data=workingday_df, x="workingday",
+                y="cnt", hue="yr", palette="viridis")
     plt.ylabel("Jumlah")
     plt.title("Jumlah total sepeda yang disewakan berdasarkan hari Kerja")
     plt.legend(title="Tahun", loc="upper right")
@@ -186,9 +197,9 @@ st.pyplot(fig)
 with st.expander('Keterangan'):
     st.write(
         """
-        `Winter`: Musim Dingin
-        `Summer`: Musim Panas
-        `Springer`: Musim Semi
+        `Winter`: Musim Dingin  
+        `Summer`: Musim Panas  
+        `Springer`: Musim Semi  
         `Fall`: Musim Gugur
         """
     )
@@ -196,7 +207,8 @@ with st.expander('Keterangan'):
 # pola yang terjadi pada jumlah total penyewaan sepeda berdasarkan Cuaca
 st.subheader("Statistik total penyewaan sepeda berdasarkan Cuaca")
 fig, ax = plt.subplots()
-sns.barplot(data=weather_df, x="weathersit", y="cnt", hue="yr", palette="viridis")
+sns.barplot(data=weather_df, x="weathersit",
+            y="cnt", hue="yr", palette="viridis")
 plt.ylabel("Jumlah")
 plt.title("Jumlah total sepeda yang disewakan berdasarkan Cuaca")
 plt.legend(title="Tahun", loc="upper right")
@@ -209,11 +221,35 @@ with st.expander('Keterangan'):
     st.write(
         """
         `1`: Clear
-
+        
         `2`: Mist + Cloudy
-
+        
         `3`: Light Snow
         """
     )
 
-st.caption("Copyright " + str(datetime.date.today().year) + " " + "[DYF]")
+
+def weathersit_temp(df):
+    st.subheader("Temprature")
+    sns.regplot(x=df["temp"], y=df["cnt"])
+    plt.title("Analisis Regresi berdasarkan Temperatur")
+    plt.xlabel("Temperatur (Celcius)")
+    plt.ylabel("Total Sepeda yang Disewakan")
+    plt.show()
+
+
+def weathersit_hum(df):
+    st.subheader("Kelembapan")
+    sns.regplot(x=df["hum"], y=df["cnt"])
+    plt.title("Analisis Regresi berdasarkan kelembapan")
+    plt.xlabel("Kelembapan")
+    plt.ylabel("Total Sepeda yang Disewakan")
+    plt.show()
+
+
+# Memanggil fungsi weathersit_temp dan weathersit_hum
+weathersit_temp(day_clean_df)
+weathersit_hum(day_clean_df)
+
+st.caption("Copyright " + str(datetime.date.today().year) +
+           " " + "[Dhea Yuza Fadiya]")
