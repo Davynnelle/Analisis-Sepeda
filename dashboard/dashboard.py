@@ -90,6 +90,8 @@ hourly_df = hourly_df.replace({
     "yr": {0: 2011, 1: 2012}
 })
 
+print(main_df.columns)
+
 st.header('Bike Sharing Dashboard 🚵')
 # Menampilkan Bagaimana tren terakhir terkait jumlah pengguna baru dengan pengguna casual dalam beberapa tahun terakhir
 st.subheader('Statistik Total Casual Vs Total Registered')
