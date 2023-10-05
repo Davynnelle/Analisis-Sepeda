@@ -62,7 +62,7 @@ def create_byweather_df(df):
 
 
 # Load cleaned data
-day_clean_df = pd.read_csv("ashboard/dashboard.py")
+day_clean_df = pd.read_csv("dashboard/dashboard.py")
 
 hour_df = pd.read_csv("ata/hour.csv")
 
