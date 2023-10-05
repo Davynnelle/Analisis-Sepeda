@@ -63,9 +63,6 @@ min_date = day_clean_df["dteday"].min()
 max_date = day_clean_df["dteday"].max()
 
 with st.sidebar:
-    # Menambahkan logo
-    st.image("dashboard/undraw_bike_ride_7xit.png")
-
     # Mengambil start_date & end_date dari date_input
     start_date, end_date = st.date_input(
         label='Rentang Waktu',
