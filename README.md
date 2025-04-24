@@ -19,4 +19,4 @@ Project ini merupakan proyek Analisis Data pada dataset Bike Sharing. Hasil anal
 streamlit run dashboard.py
 ```
 
-📄 Note: This project is based on an final submission from the course "Belajar Analisis Data dengan Python" on Dicoding Indonesia. The goal was to implement and expand on the core concepts introduced in the course.
+🎓 Note: This project was developed as part of Dicoding Indonesia's "Belajar Analisis Data dengan Python" course, where I expanded on the curriculum by adding interactive elements and advanced visualizations to the dashboard.
